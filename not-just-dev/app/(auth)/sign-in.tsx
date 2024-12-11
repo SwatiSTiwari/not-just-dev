@@ -3,10 +3,37 @@ import React, { useState } from 'react';
 import { Colors } from '@/constants/Colors';
 import Button from '@/components/ui/Button';
 import { Link, Stack } from 'expo-router';
+import { supabase } from '@/lib/superbase';
+import { Alert } from 'react-native';
+import { router } from "expo-router";
+import ProductListItem from '@/components/ui/ProductListItem';
+import products from '@/assets/data/products';
 
 const SignInScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false)
+  
+
+
+
+
+  async function signInWithEmail() {
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
+
+    if (error) {
+      Alert.alert('Error', error.message);
+    } else {
+      // Navigate to the home page on successful login
+      router.push('/(user)/menu'); 
+    }
+
+    setLoading(false);
+  }
 
   return (
     <View style={styles.container}>
@@ -29,7 +56,7 @@ const SignInScreen = () => {
         secureTextEntry
       />
 
-      <Button text="Sign in" />
+      <Button text="Sign in" disabled={loading} onPress={() => signInWithEmail()} />
       <Link href="/sign-up" style={styles.textButton}>
         Create an account
       </Link>
